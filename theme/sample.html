@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>lectern theme specimen</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Style specimen only. Every value below is a token or derived from layout arithmetic. */
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+#stage {
+  position: relative; width: var(--stage-w); height: var(--stage-h); overflow: hidden;
+  background: var(--bg); color: var(--ink-1);
+  font-family: var(--font-sans); font-size: var(--text-body); line-height: var(--leading-prose);
+  -webkit-font-smoothing: antialiased; font-kerning: normal;
+}
+.abs { position: absolute; }
+.mono { font-family: var(--font-mono); }
+
+/* headline */
+#head { left: var(--gutter); right: var(--gutter); top: 36px; display: flex; align-items: baseline; gap: var(--space-4); }
+#head .n { font: var(--weight-regular) var(--text-label)/1 var(--font-mono); color: var(--ink-3); }
+#head h1 { margin: 0; font-size: var(--text-headline); line-height: var(--leading-tight); font-weight: var(--weight-strong); letter-spacing: -0.01em; }
+
+/* token strip */
+#strip { left: var(--gutter); right: var(--gutter); top: 130px; display: flex; gap: var(--space-3); }
+.tok {
+  flex: 1; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: var(--surface-2); border: var(--stroke-hair) solid var(--rule); border-radius: var(--radius-1);
+  position: relative;
+}
+.tok .lit { font: var(--weight-medium) var(--text-token)/1.1 var(--font-mono); color: var(--ink-1); }
+.tok .ty  { font: var(--weight-regular) var(--text-meta)/1.1 var(--font-mono); color: var(--ink-3); letter-spacing: var(--tracking-meta); }
+.tok.cur  { border-color: var(--cursor); }
+.tok.peek { border-color: var(--peek); }
+.mark { position: absolute; left: 0; right: 0; top: calc(100% + var(--space-3)); display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
+.mark i { display: block; width: 100%; height: var(--stroke-mark); }
+.mark b { font: var(--weight-medium) var(--text-label)/1 var(--font-mono); }
+.cur  .mark i { background: var(--cursor); } .cur  .mark b { color: var(--cursor); }
+.peek .mark i { background: var(--peek); }   .peek .mark b { color: var(--peek); }
+
+/* dashed group: outline sits in the gutter between cells, label sits ABOVE (markers own the space below) */
+#groups { left: 0; top: 0; width: var(--stage-w); height: var(--stage-h); overflow: visible; pointer-events: none; }
+#groups rect { fill: none; stroke: var(--ink-3); stroke-width: var(--stroke-line); stroke-dasharray: var(--dash); }
+.glabel { font: var(--weight-regular) var(--text-label)/1 var(--font-mono); color: var(--ink-2); }
+
+/* code panel */
+#code {
+  left: var(--gutter); top: 272px; width: 760px; bottom: var(--gutter);
+  background: var(--surface-1); border: var(--stroke-hair) solid var(--rule); border-radius: var(--radius-2); overflow: hidden;
+}
+#code .file {
+  height: 40px; padding: 0 var(--space-5) 0 56px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: var(--stroke-hair) solid var(--rule);
+  font: var(--weight-regular) var(--text-meta)/1 var(--font-mono); color: var(--ink-3); letter-spacing: var(--tracking-meta);
+}
+#code pre {
+  margin: 0; padding: var(--space-2) 0; font: var(--weight-regular) var(--text-code)/var(--leading-code) var(--font-mono);
+  tab-size: var(--tab-size); color: var(--syn-plain);
+}
+.ln { display: flex; align-items: baseline; position: relative; height: calc(var(--text-code) * var(--leading-code)); }
+.ln .no { flex: none; width: 56px; padding-right: var(--space-4); text-align: right; color: var(--ink-4); font-size: var(--text-meta); }
+.ln .tx { white-space: pre; }
+.ln.hl { background: var(--highlight-wash); }
+.ln.hl::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--stroke-mark); background: var(--highlight); }
+.ln.hl .no { color: var(--highlight); }
+.ln.fold .tx { color: var(--ink-3); }
+.k { color: var(--syn-keyword); } .t { color: var(--syn-type); } .s { color: var(--syn-string); }
+.c { color: var(--syn-number); } .d { color: var(--syn-func); font-weight: var(--syn-func-weight); }
+.p { color: var(--syn-punct); } .q { color: var(--syn-pkg); } .cm { color: var(--syn-comment); font-style: italic; }
+
+/* tree */
+#tree { left: 848px; top: 296px; width: 384px; height: 220px; }
+#tree svg { position: absolute; inset: 0; overflow: visible; }
+#tree line { stroke: var(--rule-strong); stroke-width: var(--stroke-line); stroke-linecap: round; }
+.node {
+  position: absolute; height: 46px; min-width: 64px; padding: 0 var(--space-4); transform: translateX(-50%);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-2); border: var(--stroke-line) solid var(--rule-strong); border-radius: var(--radius-1);
+  font: var(--weight-medium) var(--text-token)/1 var(--font-mono); color: var(--ink-1);
+}
+.node.hl { border-color: var(--highlight); color: var(--highlight); }
+.elabel { position: absolute; font: var(--weight-regular) var(--text-meta)/1 var(--font-mono); color: var(--ink-3); }
+
+/* callout: a sentence with a quiet rule, nothing else */
+#callout {
+  left: 848px; width: 384px; bottom: var(--gutter); padding-left: var(--space-5);
+  border-left: var(--stroke-line) solid var(--rule-strong);
+  font-size: var(--text-body); line-height: var(--leading-prose); color: var(--ink-1);
+}
+#callout code { font: var(--weight-medium) 0.92em var(--font-mono); color: var(--ink-1); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="head" class="abs"><span class="n">06</span><h1>Reading the arguments</h1></div>
+
+  <div id="strip" class="abs">
+    <div class="tok"><span class="lit">add</span><span class="ty">IDENT</span></div>
+    <div class="tok"><span class="lit">(</span><span class="ty">LPAREN</span></div>
+    <div class="tok" data-g="a0"><span class="lit">1</span><span class="ty">INT</span></div>
+    <div class="tok"><span class="lit">,</span><span class="ty">COMMA</span></div>
+    <div class="tok" data-g="a1"><span class="lit">2</span><span class="ty">INT</span></div>
+    <div class="tok" data-g="a1"><span class="lit">*</span><span class="ty">ASTERISK</span></div>
+    <div class="tok cur" data-g="a1"><span class="lit">3</span><span class="ty">INT</span><div class="mark"><i></i><b>cur</b></div></div>
+    <div class="tok peek"><span class="lit">)</span><span class="ty">RPAREN</span><div class="mark"><i></i><b>peek</b></div></div>
+    <div class="tok"><span class="lit">;</span><span class="ty">SEMICOLON</span></div>
+  </div>
+  <svg id="groups" class="abs"></svg>
+
+  <div id="code" class="abs">
+    <div class="file"><span>parser/parser.go</span></div>
+<pre><div class="ln"><span class="no">231</span><span class="tx"><span class="k">func</span> <span class="p">(</span>p <span class="p">*</span><span class="t">Parser</span><span class="p">)</span> <span class="d">parseCallArguments</span><span class="p">()</span> <span class="p">[]</span><span class="q">ast.</span><span class="t">Expression</span> <span class="p">{</span></span></div><div class="ln fold"><span class="no"></span><span class="tx">	⋯ 4 lines: make args, parse the first one</span></div><div class="ln"><span class="no">236</span><span class="tx">	<span class="k">for</span> p.peekTokenIs<span class="p">(</span><span class="q">token.</span><span class="c">COMMA</span><span class="p">)</span> <span class="p">{</span></span></div><div class="ln"><span class="no">237</span><span class="tx">		p.nextToken<span class="p">()</span> <span class="cm">// step onto the comma</span></span></div><div class="ln"><span class="no">238</span><span class="tx">		p.nextToken<span class="p">()</span> <span class="cm">// step past it</span></span></div><div class="ln hl"><span class="no">239</span><span class="tx">		args <span class="p">=</span> append<span class="p">(</span>args<span class="p">,</span> p.parseExpression<span class="p">(</span><span class="c">LOWEST</span><span class="p">))</span></span></div><div class="ln"><span class="no">240</span><span class="tx">	<span class="p">}</span></span></div><div class="ln"><span class="no">241</span><span class="tx">	<span class="k">if</span> <span class="p">!</span>p.expectPeek<span class="p">(</span><span class="q">token.</span><span class="c">RPAREN</span><span class="p">)</span> <span class="p">{</span></span></div><div class="ln"><span class="no">242</span><span class="tx">		<span class="k">return</span> <span class="c">nil</span></span></div><div class="ln"><span class="no">243</span><span class="tx">	<span class="p">}</span></span></div><div class="ln"><span class="no">244</span><span class="tx">	<span class="k">return</span> args</span></div><div class="ln"><span class="no">245</span><span class="tx"><span class="p">}</span></span></div></pre>
+  </div>
+
+  <div id="tree" class="abs">
+    <svg id="edges"></svg>
+    <div class="node" id="n0" style="left:192px;top:0px">call</div>
+    <div class="node" id="n1" style="left:52px;top:170px">add</div>
+    <div class="node" id="n2" style="left:192px;top:170px">1</div>
+    <div class="node hl" id="n3" style="left:332px;top:170px">*</div>
+  </div>
+
+  <div id="callout" class="abs">A comma ends the argument.</div>
+</div>
+<script>
+// Specimen-only geometry: group outline around its cells, tree edges between box edges.
+document.fonts.ready.then(() => {
+  const NS = 'http://www.w3.org/2000/svg', stage = document.getElementById('stage').getBoundingClientRect();
+  const svg = document.getElementById('groups'), pad = 6;
+  const groups = {};
+  document.querySelectorAll('[data-g]').forEach(el => (groups[el.dataset.g] ||= []).push(el.getBoundingClientRect()));
+  const labels = { a1: 'arg 1' };
+  for (const [g, rs] of Object.entries(groups)) {
+    if (!labels[g]) continue;
+    const x = rs[0].left - stage.left - pad, y = rs[0].top - stage.top - pad;
+    const w = rs.at(-1).right - rs[0].left + 2 * pad, h = rs[0].height + 2 * pad;
+    const r = document.createElementNS(NS, 'rect');
+    Object.entries({ x, y, width: w, height: h, rx: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--radius-2')) }).forEach(([k, v]) => r.setAttribute(k, v));
+    svg.appendChild(r);
+    const l = document.createElement('div');
+    l.className = 'abs glabel'; l.textContent = labels[g];
+    l.style.left = x + 'px'; l.style.top = (y - 26) + 'px';
+    document.getElementById('stage').appendChild(l);
+  }
+  const tree = document.getElementById('tree').getBoundingClientRect(), edges = document.getElementById('edges');
+  const box = id => document.getElementById(id).getBoundingClientRect();
+  const p = box('n0');
+  for (const id of ['n1', 'n2', 'n3']) {
+    const c = box(id), ln = document.createElementNS(NS, 'line');
+    Object.entries({ x1: p.left + p.width / 2 - tree.left, y1: p.bottom - tree.top + 4,
+                     x2: c.left + c.width / 2 - tree.left, y2: c.top - tree.top - 4 }).forEach(([k, v]) => ln.setAttribute(k, v));
+    edges.appendChild(ln);
+  }
+  document.body.dataset.ready = '1';
+});
+</script>
+</body>
+</html>

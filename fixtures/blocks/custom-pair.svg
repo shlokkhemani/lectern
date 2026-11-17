@@ -1,0 +1,5 @@
+<svg viewBox="0 0 300 80">
+  <g data-id="a"><rect x="0" y="0" width="120" height="60"/><text x="60" y="38" text-anchor="middle" font-size="20">left</text></g>
+  <path data-id="link" d="M120 30 H180"/>
+  <g data-id="b"><rect x="180" y="0" width="120" height="60"/><text x="240" y="38" text-anchor="middle" font-size="20">right</text></g>
+</svg>

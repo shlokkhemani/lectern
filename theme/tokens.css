@@ -1,0 +1,107 @@
+/* lectern — the one theme. Custom properties only; blocks read these and nothing else.
+   Colours are OKLCH so lightness and chroma are explicit: equal L = equal visual weight. */
+:root {
+  /* ---------- canvas & surfaces ---------- */
+  --bg:          oklch(0.180 0.004 265);  /* graphite, not black: survives h264 without crushing or banding */
+  --surface-1:   oklch(0.208 0.004 265);  /* panels (code, trace): one step up, felt more than seen */
+  --surface-2:   oklch(0.245 0.005 265);  /* cells and nodes: objects you can point at */
+  --rule:        oklch(0.300 0.005 265);  /* hairline borders: structure, never decoration */
+  --rule-strong: oklch(0.420 0.006 265);  /* tree edges, node outlines: must survive 40% playback */
+
+  /* ---------- ink (text) ---------- */
+  --ink-1: oklch(0.935 0.008 85);  /* primary text: warm paper white, pure #fff glares on dark */
+  --ink-2: oklch(0.745 0.008 85);  /* secondary: labels, punctuation, qualifiers */
+  --ink-3: oklch(0.590 0.008 85);  /* tertiary: meta, line numbers, group outlines (≈4.6:1 on bg) */
+  --ink-4: oklch(0.440 0.006 85);  /* faint: elisions, inactive; never for anything that must be read */
+
+  /* ---------- the accent: "this, now" ---------- */
+  --accent:      oklch(0.820 0.135 75);        /* amber: the single thing the narration is on */
+  --accent-ink:  oklch(0.230 0.030 75);        /* text set ON an accent fill */
+  --accent-wash: oklch(0.820 0.135 75 / 0.11); /* tint behind a highlighted line/region; low so text keeps contrast */
+
+  /* ---------- semantic roles (each has exactly one job) ---------- */
+  --highlight:      var(--accent);       /* hl verb: what we are talking about */
+  --highlight-wash: var(--accent-wash);  /* hl verb on large areas (code lines) */
+  --cursor:         var(--accent);       /* cur marker: the parser is HERE, same as "now" */
+  --peek:           oklch(0.770 0.085 245); /* peek marker: cool steel, reads as "next", never competes with amber */
+  --ok:             oklch(0.790 0.120 150); /* pass / correct: clear green, only for an outcome, never decoration */
+  --error:          oklch(0.700 0.145 30);  /* fail / wrong: terracotta, distinguishable from amber by hue AND lightness */
+  --dim-opacity:    0.30;                   /* dim verb: present but out of the conversation */
+
+  /* ---------- Go syntax: muted, equal-lightness, hues kept clear of amber/terracotta ---------- */
+  --syn-plain:   var(--ink-1);              /* identifiers: the content, so the brightest */
+  --syn-keyword: oklch(0.780 0.065 295);    /* func for if return: soft lilac, recedes into structure */
+  --syn-type:    oklch(0.800 0.060 190);    /* Parser, Expression, int, string: muted teal */
+  --syn-string:  oklch(0.800 0.065 135);    /* "literals": sage, softer than --ok */
+  --syn-number:  oklch(0.780 0.065 345);    /* 42, nil, true, LOWEST, iota: dusty rose for constants */
+  --syn-func:    var(--ink-1);              /* name being defined: weight not colour (see --syn-func-weight) */
+  --syn-func-weight: 600;                   /* definitions stand out typographically, as in Alabaster */
+  --syn-call:    var(--ink-1);              /* calls stay plain: too many colours is noise */
+  --syn-pkg:     var(--ink-2);              /* token. ast. fmt.: qualifier steps back so the name reads */
+  --syn-punct:   var(--ink-2);              /* ( ) { } , := : visible but quieter than words */
+  --syn-comment: oklch(0.600 0.010 85);     /* comments: italic grey, readable but clearly aside */
+
+  /* ---------- type ---------- */
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;     /* prose: engineered grotesk, warm, unfashionable in the right way */
+  --font-mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;   /* code: same superfamily, slab i/l/1 disambiguate at small size */
+
+  /* Scale on a 1280x720 stage. Floor is 16px: at 40% playback that is ~6.4px, the limit for non-essential meta. */
+  --text-meta:     16px;  /* file names, token types, line numbers: glanceable only */
+  --text-label:    18px;  /* marker and group labels: must be read, so above the floor */
+  --text-code:     20px;  /* code panels: ~55 columns in 720px, still 8px at 40% */
+  --text-body:     24px;  /* callouts, sentences on screen */
+  --text-token:    28px;  /* token literals and tree nodes: the objects of the lesson */
+  --text-headline: 34px;  /* scene headline: one line, never shouted */
+  --text-title:    56px;  /* title card only */
+
+  --leading-tight: 1.15;  /* headlines and single-line labels */
+  --leading-code:  1.4;   /* 28px rows at 20px: highlight band has air, 12 lines fit a half-height panel */
+  --leading-prose: 1.4;   /* on-screen sentences */
+  --weight-regular: 400;  /* everything by default */
+  --weight-medium:  500;  /* tokens and node labels: a touch more presence */
+  --weight-strong:  600;  /* headlines and definitions; never 700+ */
+  --tracking-meta:  0.02em; /* small text opens up slightly; no ALL-CAPS tracking games */
+  --tab-size: 4;          /* Go is tab-indented; 4 columns reads as gofmt does in editors */
+
+  /* ---------- space (4px base) ---------- */
+  --space-1: 4px;   /* hairline gaps: marker bar to label */
+  --space-2: 8px;   /* inside small things */
+  --space-3: 12px;  /* between sibling cells */
+  --space-4: 16px;  /* panel padding (tight axis) */
+  --space-5: 24px;  /* panel padding, between related blocks */
+  --space-6: 32px;  /* between unrelated blocks */
+  --space-7: 48px;  /* stage gutter: left/right/bottom safe area */
+  --space-8: 64px;  /* vertical air between headline and first block when space allows */
+  --stage-w: 1280px; /* fixed canvas */
+  --stage-h: 720px;
+  --gutter:  var(--space-7); /* nothing may sit closer to the frame edge */
+
+  /* ---------- strokes ---------- */
+  --stroke-hair:   1px;    /* panel and cell borders: 1.5 device px at DPR 1.5 */
+  --stroke-line:   1.5px;  /* node outlines, group outlines, tree edges */
+  --stroke-mark:   3px;    /* cur/peek bars and highlighted-line bar: the only thick strokes */
+  --dash: 5px 4px;         /* dashed groups: short dash reads as "a grouping", not a border */
+
+  /* ---------- radii ---------- */
+  --radius-0: 0;    /* rules, bars, highlight bands */
+  --radius-1: 3px;  /* cells, nodes, chips: softens the pixel corner, not a pill */
+  --radius-2: 5px;  /* panels and groups: a hair larger so nested corners stay concentric */
+
+  /* ---------- motion (engine evaluates these curves in render(t); no springs, no overshoot) ---------- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);     /* arrivals: fast start, long settle */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);    /* travel: things that move between two places */
+  --ease-draw:   cubic-bezier(0.45, 0, 0.25, 1);    /* lines drawing: even pen speed, gentle ends */
+  --ease-in:     cubic-bezier(0.5, 0, 0.75, 0);     /* exits: leave quickly, don't linger */
+
+  --dur-appear:    360ms;  /* show: opacity 0→1 + 8px rise */
+  --appear-rise:   8px;    /* small enough to read as "placed", not "flying in" */
+  --dur-hide:      220ms;  /* hide: shorter than appear, attention has already moved */
+  --dur-move:      560ms;  /* move/swap: slow enough for the eye to track the object */
+  --dur-grow:      620ms;  /* grow: tree edges and arrows drawing themselves */
+  --dur-highlight: 240ms;  /* hl/dim: a decisive change, not a fade */
+  --stagger:       70ms;   /* between siblings revealed together (tree children, token cells) */
+  --ease-appear:    var(--ease-out);
+  --ease-move:      var(--ease-in-out);
+  --ease-grow:      var(--ease-draw);
+  --ease-highlight: var(--ease-out);
+}

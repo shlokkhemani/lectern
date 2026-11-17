@@ -1,0 +1,11 @@
+/* Vendored IBM Plex (SIL OFL 1.1), latin subset, so frames render identically offline. */
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 100 700; font-display: block;
+  src: url(fonts/IBMPlexSans-var.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: block;
+  src: url(fonts/IBMPlexMono-400.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: italic; font-weight: 400; font-display: block;
+  src: url(fonts/IBMPlexMono-400i.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: block;
+  src: url(fonts/IBMPlexMono-500.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: block;
+  src: url(fonts/IBMPlexMono-600.woff2) format("woff2"); }

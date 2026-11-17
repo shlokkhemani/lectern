@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>lectern theme v2 specimen</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Style + composition specimen. ?f=main|dim|bullets. All values are tokens; positions come from layout() below. */
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+#stage {
+  position: relative; width: var(--stage-w); height: var(--stage-h); overflow: hidden; background: var(--bg); color: var(--ink-1);
+  font-family: var(--font-sans); font-variant-numeric: var(--numeric); -webkit-font-smoothing: antialiased;
+}
+.abs { position: absolute; }
+.recede { opacity: var(--recede-opacity); }
+
+#head { left: var(--margin-x); top: var(--margin-y); display: flex; gap: var(--space-4); font-size: var(--text-headline); line-height: 40px;
+        font-weight: var(--weight-strong); letter-spacing: var(--headline-tracking); white-space: nowrap; }
+#head .n { color: var(--ink-3); font-weight: var(--weight-medium); }
+
+/* token strip */
+.strip { height: 136px; }
+.tok { position: absolute; top: 36px; height: var(--cell-h); border-radius: var(--radius-cell); background: var(--surface-2);
+       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tok .lit { font: var(--weight-medium) var(--text-token)/30px var(--font-mono); color: var(--ink-1); }
+.tok .lit.low  { transform: translateY(var(--optical-low)); }
+.tok .lit.high { transform: translateY(var(--optical-high)); }
+.tok .ty { font: var(--weight-regular) var(--text-meta)/16px var(--font-sans); color: var(--ink-3); }
+.tok.cur { background: var(--hl-fill-cell); }
+.tok.cur .lit { color: var(--hl-now-ink); }
+.tok.cur.held .lit { color: var(--hl-held-ink); }
+.mark { position: absolute; left: 0; right: 0; top: calc(var(--cell-h) + 8px); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mark i { display: block; width: 100%; height: var(--stroke-mark); border-radius: 1px; }
+.mark b { font: var(--weight-medium) var(--text-label)/16px var(--font-sans); }
+.cur .mark i { background: var(--hl-now-bar); } .cur .mark b { color: var(--hl-now-ink); }
+.cur.held .mark i { background: var(--hl-held-bar); } .cur.held .mark b { color: var(--hl-held-ink); }
+.peek .mark i { background: var(--peek); } .peek .mark b { color: var(--peek); }
+.bracket { position: absolute; top: 22px; height: 8px; border: var(--stroke-hair) solid var(--ink-3); border-bottom: 0; border-radius: 2px 2px 0 0; }
+.blabel  { position: absolute; top: 0; font: var(--weight-medium) var(--text-label)/16px var(--font-sans); color: var(--ink-2); white-space: nowrap; }
+
+/* region label */
+.rlabel { font: var(--weight-regular) var(--text-meta)/14px var(--font-mono); color: var(--ink-3); margin-bottom: var(--label-gap); }
+
+/* code */
+.code { width: max-content; }
+.field { background: var(--surface-1); border-radius: var(--radius-field); overflow: hidden; padding: var(--space-2) 0; }
+.ln { display: flex; height: var(--leading-code); align-items: center; position: relative;
+      font: var(--weight-regular) var(--text-code)/var(--leading-code) var(--font-mono); tab-size: var(--tab-size); color: var(--syn-plain); }
+.ln .no { flex: none; width: 48px; margin-right: 20px; text-align: right; font-size: var(--text-meta); color: var(--ink-3); }
+.ln .tx { white-space: pre; padding-right: var(--space-5); }
+.ln.hl { background: var(--hl-fill-line); }
+.ln.hl::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--stroke-mark); background: var(--hl-held-bar); }
+.ln.hl .no { color: var(--hl-held-ink); }
+.ln.hl.now::before { background: var(--hl-now-bar); } .ln.hl.now .no { color: var(--hl-now-ink); }
+.ln.fold .tx { color: var(--ink-3); font-family: var(--font-sans); font-size: var(--text-meta); }
+.k { color: var(--syn-keyword); } .l { color: var(--syn-literal); } .d { font-weight: var(--syn-def-weight); }
+.p { color: var(--syn-punct); } .q { color: var(--syn-pkg); } .cm { color: var(--syn-comment); font-style: var(--syn-comment-style); }
+
+/* tree */
+.tree { position: relative; }
+.tree svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.tree path { fill: none; stroke: var(--line-strong); stroke-width: var(--stroke-edge); stroke-linecap: round; stroke-linejoin: round; }
+.tree path.recede { stroke: var(--ink-4); opacity: 1; }
+.tree path.focus { stroke: var(--hl-now-bar); }
+.node { position: absolute; width: var(--node-w); height: var(--node-h); border-radius: var(--radius-cell); background: var(--surface-2);
+        display: flex; align-items: center; justify-content: center;
+        font: var(--weight-medium) var(--text-node)/1 var(--font-mono); color: var(--ink-1); }
+.node.high { padding-top: calc(2 * var(--optical-high)); }
+.node.focus { background: var(--hl-fill-cell); color: var(--hl-now-ink); }
+
+/* prose */
+.callout { font: var(--weight-regular) var(--text-body)/var(--leading-prose) var(--font-sans); color: var(--ink-1); text-align: center; max-width: var(--measure-max); }
+.bullets { margin: 0; padding: 0; list-style: none; max-width: var(--measure-max); width: max-content;
+           font: var(--weight-regular) var(--text-body)/var(--leading-prose) var(--font-sans); color: var(--ink-1); }
+.bullets li { position: relative; padding-left: 28px; }
+.bullets li + li { margin-top: var(--space-5); }
+.bullets li::before { content: ""; position: absolute; left: 0; top: 0.7em; width: 12px; height: var(--stroke-mark); background: var(--ink-3); }
+.bullets code { font: var(--weight-medium) 0.92em var(--font-mono); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+const F = new URLSearchParams(location.search).get('f') || 'main';
+const T = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n));
+const stage = document.getElementById('stage');
+const mk = (tag, cls, html, parent = stage) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; parent.appendChild(e); return e; };
+const P = s => `<span class="p">${s}</span>`, K = s => `<span class="k">${s}</span>`, L = s => `<span class="l">${s}</span>`, Q = s => `<span class="q">${s}</span>`;
+
+/* ---------- content (what an agent's script would declare) ---------- */
+const TOKENS = [['add', 'ident'], ['(', 'lparen'], ['1', 'int'], [',', 'comma', 'low'], ['2', 'int'], ['*', 'asterisk', 'high'],
+                ['3', 'int'], [')', 'rparen'], [';', 'semicolon', 'low']];
+const ARGS_CODE = { file: 'parser/parser.go', lines: [
+  [231, `${K('func')} ${P('(')}p ${P('*')}Parser${P(')')} <span class="d">parseCallArguments</span>${P('()')} ${P('[]')}${Q('ast.')}Expression ${P('{')}`],
+  [null, `	⋯ 4 lines: make args, parse the first one`],
+  [236, `	${K('for')} p.peekTokenIs${P('(')}${Q('token.')}${L('COMMA')}${P(')')} ${P('{')}`],
+  [237, `		p.nextToken${P('()')} <span class="cm">// step onto the comma</span>`],
+  [238, `		p.nextToken${P('()')} <span class="cm">// step past it</span>`],
+  [239, `		args ${P('=')} append${P('(')}args${P(',')} p.parseExpression${P('(')}${L('LOWEST')}${P('))')}`],
+  [240, `	${P('}')}`],
+  [241, `	${K('if')} ${P('!')}p.expectPeek${P('(')}${Q('token.')}${L('RPAREN')}${P(')')} ${P('{')}`],
+  [242, `		${K('return')} ${L('nil')}`],
+  [243, `	${P('}')}`],
+  [244, `	${K('return')} args`],
+  [245, `${P('}')}`]] };
+const prec = (k, v, n) => [n, `	${Q('token.')}${L(k)}${P(':')}${' '.repeat(9 - k.length)}${L(v)}${P(',')}`];
+const PREC_CODE = { file: 'parser/parser.go', lines: [
+  [12, `${K('var')} precedences ${P('=')} ${K('map')}${P('[')}${Q('token.')}TokenType${P(']')}int${P('{')}`],
+  prec('EQ', 'EQUALS', 13), prec('NOT_EQ', 'EQUALS', 14), prec('LT', 'LESSGREATER', 15), prec('GT', 'LESSGREATER', 16),
+  prec('PLUS', 'SUM', 17), prec('MINUS', 'SUM', 18), prec('SLASH', 'PRODUCT', 19), prec('ASTERISK', 'PRODUCT', 20),
+  prec('LPAREN', 'CALL', 21), [22, `${P('}')}`]] };
+
+const FRAMES = {
+  main: { head: 'Reading the arguments',
+    rows: [{ strip: { cur: 6, peek: 7, group: [4, 6, 'argument 2'] } },
+           { regions: [{ code: ARGS_CODE, hl: 239 },
+                       { stack: [{ tree: { nodes: ['call', 'add', '1', '*'], kids: { 0: [1, 2, 3] } } }, { callout: 'A comma ends the argument.' }] }] }] },
+  dim: { head: 'Building the tree',
+    rows: [{ strip: { cur: 4, peek: 5, group: [4, 6, 'argument 2'] } },
+           { regions: [{ code: ARGS_CODE, hl: 239, recede: true },
+                       { stack: [{ tree: { nodes: ['call', 'add', '1', '*', '2'], kids: { 0: [1, 2, 3], 3: [4] }, focus: 4 } },
+                                 { callout: '2 becomes the left side of *.' }] }] }] },
+  held: { head: 'Building the tree',
+    rows: [{ strip: { cur: 4, peek: 5, group: [4, 6, 'argument 2'], curHeld: true } },
+           { regions: [{ code: ARGS_CODE, hl: 239 },
+                       { stack: [{ tree: { nodes: ['call', 'add', '1', '*', '2'], kids: { 0: [1, 2, 3], 3: [4] }, focus: 4, noRecede: true } },
+                                 { callout: '2 becomes the left side of *.' }] }] }] },
+  bullets: { head: 'Calls bind tightest',
+    rows: [{ regions: [{ code: PREC_CODE, hl: 21 },
+                       { stack: [{ bullets: ['<code>(</code> after an expression is an infix operator.', 'It gets the highest precedence, <code>CALL</code>.',
+                                             'So <code>add(1)</code> groups before <code>+</code> can grab it.'] }] }] }] },
+};
+const FR = FRAMES[F];
+
+/* ---------- builders: each returns an element with a natural size, plus an optional flex(width) hook ---------- */
+function buildStrip({ cur, peek, group, curHeld }) {
+  const el = mk('div', 'abs strip');
+  const cells = TOKENS.map(([lit, ty, opt], i) => {
+    const inG = i >= group[0] && i <= group[1], st = i === cur ? 'cur' : i === peek ? 'peek' : '';
+    const c = mk('div', `tok ${st} ${st === 'cur' && curHeld ? 'held' : ''} ${!inG && !st ? 'recede' : ''}`, `<span class="lit ${opt || ''}">${lit}</span><span class="ty">${ty}</span>`, el);
+    if (st) c.insertAdjacentHTML('beforeend', `<div class="mark"><i></i><b>${st}</b></div>`);
+    return c;
+  });
+  const br = mk('div', 'bracket', null, el), bl = mk('div', 'blabel', group[2], el);
+  // Rule 1: cells flex to share the full width, clamped; centred when they hit max.
+  el.flex = W => {
+    const n = cells.length, gap = T('--cell-gap');
+    const w = Math.min(T('--cell-max'), Math.max(T('--cell-min'), (W - (n - 1) * gap) / n));
+    const x0 = (W - (n * w + (n - 1) * gap)) / 2;
+    cells.forEach((c, i) => Object.assign(c.style, { left: x0 + i * (w + gap) + 'px', width: w + 'px' }));
+    const gx = x0 + group[0] * (w + gap), gw = (group[1] - group[0] + 1) * w + (group[1] - group[0]) * gap;
+    Object.assign(br.style, { left: gx + 'px', width: gw + 'px' }); bl.style.left = gx + 'px';
+    el.style.width = W + 'px';
+  };
+  el.natural = () => ({ w: Infinity, h: 136 });
+  return el;
+}
+function buildCode({ code, hl, recede }) {
+  const el = mk('div', 'abs code');
+  mk('div', 'rlabel', code.file, el);
+  const f = mk('div', 'field', null, el);
+  for (const [no, tx] of code.lines)
+    mk('div', 'ln' + (no === hl ? ' hl' : '') + (no === null ? ' fold' : '') + (recede && no !== hl ? ' recede' : ''),
+       `<span class="no">${no ?? ''}</span><span class="tx">${tx}</span>`, f);
+  el.natural = () => ({ w: el.offsetWidth, h: el.offsetHeight });
+  return el;
+}
+function buildTree({ nodes, kids, focus, noRecede }, parent) {
+  const el = mk('div', 'tree', null, parent), NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg'); el.appendChild(svg);
+  const parentOf = {}; Object.entries(kids).forEach(([p, cs]) => cs.forEach(c => (parentOf[c] = +p)));
+  const depth = i => (i in parentOf ? depth(parentOf[i]) + 1 : 0);
+  const leaves = []; (function walk(i) { (kids[i] || []).length ? kids[i].forEach(walk) : leaves.push(i); })(0);
+  const nw = T('--node-w'), nh = T('--node-h'), lvl = T('--tree-level'), R = T('--radius-edge'), SP = T('--edge-spread');
+  const divs = nodes.map((lab, i) => mk('div', 'node' + (lab === '*' ? ' high' : '') + (i === focus ? ' focus' : '') + (focus != null && !noRecede && i !== focus ? ' recede' : ''), lab, el));
+  const maxD = Math.max(...nodes.map((_, i) => depth(i)));
+  const H = maxD * lvl + nh;
+  // Rule 2: sibling spacing flexes to fill the region (within min/max); the tree is then centred by its region.
+  el.flex = W => {
+    const g = Math.min(T('--tree-gap-max'), Math.max(T('--tree-gap-min'), (W - leaves.length * nw) / Math.max(1, leaves.length - 1)));
+    const x = {}; leaves.forEach((l, k) => (x[l] = k * (nw + g)));
+    (function place(i) { if (kids[i]) { kids[i].forEach(place); x[i] = kids[i].reduce((s, c) => s + x[c], 0) / kids[i].length; } })(0);
+    divs.forEach((d, i) => Object.assign(d.style, { left: x[i] + 'px', top: depth(i) * lvl + 'px' }));
+    svg.innerHTML = '';
+    Object.entries(kids).forEach(([p, cs]) => cs.forEach((c, k) => {
+      p = +p; const off = (k - (cs.length - 1) / 2) * SP;
+      const x1 = x[p] + nw / 2 + off, y1 = depth(p) * lvl + nh, x2 = x[c] + nw / 2, y2 = depth(c) * lvl, my = (y1 + y2) / 2, s = Math.sign(Math.round(x2 - x1));
+      const d = s === 0 ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${my - R} Q${x1} ${my} ${x1 + s * R} ${my} H${x2 - s * R} Q${x2} ${my} ${x2} ${my + R} V${y2}`;
+      const path = document.createElementNS(NS, 'path'); path.setAttribute('d', d);
+      if (focus != null) path.setAttribute('class', c === focus ? 'focus' : noRecede ? '' : 'recede');
+      svg.appendChild(path);
+    }));
+    const w = (leaves.length - 1) * (nw + g) + nw;
+    Object.assign(el.style, { width: w + 'px', height: H + 'px' });
+    return w;
+  };
+  return el;
+}
+function buildStack({ stack }) {
+  const el = mk('div', 'abs'), items = [];
+  for (const it of stack) {
+    if (it.tree) items.push(buildTree(it.tree, el));
+    if (it.callout) items.push(mk('div', 'callout', it.callout, el));
+    if (it.bullets) items.push(mk('ul', 'bullets', it.bullets.map(b => `<li>${b}</li>`).join(''), el));
+  }
+  // Rule 2: the stack is centred in its region, items centred on one axis, stack-gap between them.
+  el.flex = W => {
+    items.forEach(it => it.flex && it.flex(W));
+    let y = 0; const gap = T('--stack-gap');
+    const w = Math.max(...items.map(it => it.offsetWidth));
+    items.forEach(it => { Object.assign(it.style, { position: 'absolute', top: y + 'px', left: (w - it.offsetWidth) / 2 + 'px' }); y += it.offsetHeight + gap; });
+    Object.assign(el.style, { width: w + 'px', height: (y - gap) + 'px' });
+  };
+  el.natural = () => { el.flex(0); return { w: el.offsetWidth, h: el.offsetHeight }; };
+  return el;
+}
+
+/* ---------- layout(): the composition rules ---------- */
+function layout() {
+  const head = mk('div', 'abs', `<span class="n">06</span><span>${FR.head}</span>`); head.id = 'head';
+  const X0 = T('--margin-x'), W = T('--stage-w') - 2 * X0;
+  const top = T('--margin-y') + head.offsetHeight, bottom = T('--stage-h') - T('--margin-y');
+  const rows = FR.rows.map(r => {
+    if (r.strip) { const s = buildStrip(r.strip); s.flex(W); return { h: 136, place: y => Object.assign(s.style, { left: X0 + 'px', top: y + 'px' }) }; }
+    // Rule 2: regions tile the content width. Fixed-content regions (code) take their natural width;
+    // flexible regions share the rest; each region's content is centred in it, horizontally and vertically.
+    const regs = r.regions.map(g => (g.code ? { el: buildCode(g), fixed: true } : { el: buildStack(g), fixed: false }));
+    // Flexible content (trees, strips) grows first, up to its max; whatever slack is left is shared evenly
+    // between the outer edges and the gutters (space-evenly), so the row's envelope is always centred.
+    const gut = T('--region-gutter');
+    const fixedW = regs.filter(g => g.fixed).reduce((s, g) => s + g.el.natural().w, 0);
+    const flexN = regs.filter(g => !g.fixed).length;
+    const flexW = (W - fixedW - gut * (regs.length - 1)) / Math.max(1, flexN);
+    regs.forEach(g => { if (!g.fixed) g.el.flex(flexW); g.w = g.el.offsetWidth; });
+    const slack = Math.max(0, W - regs.reduce((s, g) => s + g.w, 0) - gut * (regs.length - 1)), share = slack / (regs.length + 1);
+    let x = X0 + share;
+    const spans = regs.map(g => { const s = { g, x, w: g.w }; x += g.w + gut + share; return s; });
+    const h = Math.max(...regs.map(g => g.el.offsetHeight));
+    return { h, place: y => spans.forEach(({ g, x, w }) => Object.assign(g.el.style, {
+      left: x + (w - g.el.offsetWidth) / 2 + 'px', top: y + (h - g.el.offsetHeight) / 2 + 'px' })) };
+  });
+  // Rule 3: free vertical space is shared evenly above, between and below the rows; the headline stays anchored.
+  const free = bottom - top - rows.reduce((s, r) => s + r.h, 0), gap = free / (rows.length + 1);
+  if (gap < T('--row-gap-min')) console.error(`overfull frame: even row gap ${gap.toFixed(0)}px < --row-gap-min`);
+  let y = top + gap; rows.forEach(r => { r.place(Math.round(y)); y += r.h + gap; });
+  window.LAYOUT = { rowGap: gap };
+}
+document.fonts.ready.then(() => { layout(); document.body.dataset.ready = '1'; });
+</script>
+</body>
+</html>

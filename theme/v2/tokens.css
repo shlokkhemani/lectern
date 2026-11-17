@@ -1,0 +1,174 @@
+/* lectern theme v2 — custom properties only.
+   Direction A (chosen): near-black, Vercel/Geist-precise. */
+
+:root {
+  /* ===== Colour: near-black, precise neutral ramp ===== */
+  --bg:          #0a0a0a;  /* near-black: Vercel's canvas; just off #000 so h264 keeps shadow detail */
+  --surface-1:   #111111;  /* code field: a region, felt not drawn */
+  --surface-2:   #1a1a1a;  /* token cells and nodes at rest: separates from bg by fill alone, no border */
+  --surface-3:   #262626;  /* lifted state: cur cell, focused node. State is a neutral lift; amber goes on the glyph and bar only */
+  --line:        #2e2e2e;  /* hairlines: group brackets, rare separators */
+  --line-strong: #4d4d4d;  /* tree edges at rest: readable at 40% playback */
+  --ink-1: #ededed;  /* primary: Geist's foreground; pure white glares */
+  --ink-2: #a1a1a1;  /* secondary: labels, punctuation (Vercel gray-900) */
+  --ink-3: #6f6f6f;  /* tertiary: meta, line numbers, file labels (≈4:1 on bg) */
+  --ink-4: #3e3e3e;  /* receded strokes and fills only, never text that must be read */
+  --lift:  rgb(255 255 255 / 0.05);  /* highlighted line: a neutral lift, not a colour wash */
+
+  --accent:      #f5b13d;                 /* amber: the single "now" mark */
+  --peek:        #7aa5e6;                 /* lookahead: calm blue, reads as "next", never as "now" */
+  --ok:          #4cc38a;                 /* pass outcome only */
+  --error:       #f2715f;                 /* fail outcome only; separated from amber by hue and lightness */
+  --mark-alt:    #ea8fc0;                 /* {alt}: the second referent in a contrast (parameters vs arguments). Rose: clear of
+                                             amber (now), blue (peek), violet (keywords), green (literals/ok), red (error). Never "now" */
+  --diff-add:      var(--ok);              /* added line: glyph "+" and line number; reuses ok so "added" reads as good */
+  --diff-add-fill: rgb(76 195 138 / 0.09); /* faint band behind an added line: semantic, so a tint is allowed; low so syntax stays legible */
+  --diff-del:      var(--error);           /* deleted line: glyph "-" and line number */
+  --diff-del-fill: rgb(242 113 95 / 0.09); /* faint band behind a deleted line; the deleted text itself drops to ink-3 */
+
+  /* Go syntax: greys do most of the work, two hues carry meaning */
+  --syn-plain:   var(--ink-1);  /* identifiers and type names: the content */
+  --syn-keyword: #c79be0;       /* func for if return: one soft violet */
+  --syn-literal: #79c7a9;       /* strings, numbers, nil/true, CONSTANTS: one soft green */
+  --syn-def-weight: 600;        /* the name being defined: weight, not colour */
+  --syn-punct:   #8a8a8a;       /* ( ) { } := , between ink-2 and ink-3: present, quiet */
+  --syn-pkg:     var(--ink-3);  /* token. ast. fmt.: qualifier steps back */
+  --syn-comment: var(--ink-3);  /* comments: aside */
+  --syn-comment-style: normal;  /* Geist Mono has no italic; never fake one */
+
+  --font-sans: "Geist", "Helvetica Neue", Arial, sans-serif;  /* precise grotesk, tight but open at small sizes */
+  --font-mono: "Geist Mono", "SF Mono", Menlo, monospace;  /* drawn alongside Geist: same proportions */
+  --headline-tracking: -0.02em;  /* Geist display sizes want tightening */
+  --optical-high: 0.18em;        /* Geist Mono's * sits high: lower it to the x-height centre */
+}
+
+:root {
+  /* ===== state levels (the dim verb) ===== */
+  --recede-opacity: 0.38;  /* dim/receded: still there, clearly not the subject */
+  --rest-opacity:   1;     /* normal */
+  /* Levels: now > held > rest > receded. */
+
+  /* ===== Highlight model: amber = each block's latest target =====
+     hl is exclusive per block, so several blocks can hold a highlight at once. In each block, the latest hl/set/move
+     target is "now"; that block's other active highlights (incl. the cur marker) drop to "held" when it fires. */
+  --hl-now-ink:   var(--accent);      /* glyph / label of a block's latest target: its one amber thing */
+  --hl-now-bar:   var(--accent);      /* its 2px bar (code line edge, cur/peek-style marker, tree edge) */
+  --hl-held-ink:  var(--ink-1);       /* a held target keeps full-contrast text, it is still referenced */
+  --hl-held-bar:  var(--ink-2);       /* held bar: grey, one step below ink-1 so it reads "earlier", not "gone" */
+  --hl-held-edge: var(--ink-2);       /* held tree edge: brighter than --line-strong, not amber */
+  --hl-fill-line: var(--lift);        /* the band behind a highlighted code line, now or held: neutral, never tinted */
+  --hl-fill-cell: var(--surface-3);   /* the lift behind a highlighted cell or node, now or held */
+  /* now -> held transition uses --dur-highlight; only the colour of ink/bar changes, the fill stays put (no jump). */
+
+  /* ===== Composition (the layout engine applies these to every frame) ===== */
+  --stage-w: 1280px;
+  --stage-h: 720px;
+  --margin-x: 64px;   /* content box: x 64..1216 (1152 wide). Every row spans it margin to margin */
+  --margin-y: 48px;   /* headline anchored at top margin; bottom margin is the floor of the subtitle band */
+  --subtitle-band: 32px; /* the body's floor rises by this on every scene, for the burned-in subtitle: two lines at
+                            --text-body / --leading-tight, bottom-aligned half a margin above the stage edge, reach just
+                            under the floor. Layout keeps --row-gap-min under the last row, so ink never comes closer */
+  --region-gutter: 48px; /* between side-by-side regions in a row (code | tree): one constant */
+  --row-gap-min: 24px;   /* rows are spaced evenly; if the even gap would fall below this the frame is overfull (compile error) */
+  --stack-gap:   32px;   /* between items stacked inside one region (tree, then its callout) */
+  --cell-gap:  16px;     /* between token cells */
+  --cell-min:  64px;     /* a strip with room never goes narrower; a crowded strip of short entries may, down to its widest entry */
+  --cell-max: 132px;     /* above this cells stop growing and the row is centred */
+  --cell-h:    64px;
+  --node-w:    74px;     /* tree nodes are uniform */
+  --node-h:    40px;
+  --tree-gap-min: 24px;  /* sibling spacing flexes between these to fill the tree's region */
+  --tree-gap-max: 96px;
+  --tree-level:   80px;  /* parent top to child top */
+  --measure-max: 440px;  /* prose (callouts, bullets) never wider than this, ~44 characters at 22px (Geist ≈ 10px a character) */
+  --measure-min: 360px;  /* a fixed block beside another is never laid out narrower than min(its natural width, this): ~36
+                            characters. Round 4's squeezed prose was ≤ 30 (callouts 8–17, compare columns ~7); part 8's
+                            narrowest accepted prose beside code is 368px. Narrower than this is overfull (L410) */
+  /* --- Fill: content must read on a phone (see README "Fill") --- */
+  --sparse-fill-min: 0.75;  /* trigger: rows fill < 75% of body height, or a block fits < --region-fit-min of its region → grow */
+  --scale-max: 1.5;         /* growth cap: code 19→28.5px when alone (readable at 40%: ~11px), prose 22→33px. 1.25 left s4/s9/s11 in a void */
+  --region-fit-min: 0.85;   /* a block filling less than 85% of its region on its limiting axis, max(w/regionW, h/regionH), makes the frame sparse */
+  --flex-pitch-max: 1.5;    /* tables, lists and tree levels may open their row/level pitch up to 1.5x to take vertical slack before the frame scales */
+  --row-gap-max: 72px;      /* even row gap cap: leftover height goes equally above and below the centred stack (resolves the band conflict) */
+  --code-min-render: 19px;  /* code never renders smaller than --text-code; if it would, the frame is overfull (split), never shrunk */
+  --prose-code-ratio-min: 1.15; /* callout/body text renders ≥ 1.15x the code size in the same frame (sans reads smaller than mono at equal px) */
+  --label-code-ratio-min: 0.75; /* labels/meta ≥ 0.75x code size and ≥ --text-meta: labels must not shrink to captions beside big code */
+  --graph-rank-gap-min: 48px;   /* graph: between ranks; room for an arrowhead plus a one-line edge label */
+  --graph-rank-gap-max: 120px;  /* beyond this boxes stop reading as connected; slack goes to the frame instead */
+  --graph-node-gap-min: 24px;   /* graph: between boxes in one rank (same as tree siblings) */
+  --graph-node-gap-max: 96px;
+  --chart-plot-h: 280px;        /* chart plot area at 1x: ~half the body, leaves room for title, axis labels and a callout row; grows with --scale-max */
+  --chart-plot-w-min: 240px;    /* narrowest plot or bar track: two charts side by side in 552px columns still fit (seasons Bug 2) */
+  --chart-plot-w-max: 640px;    /* widest plot or bar track: past this a lone chart scales up instead, so its text grows too */
+  --chart-ticks-max: 5;         /* y axis: 3 to 5 round ticks; more reads as a spreadsheet */
+  --chart-dot-r: 6px;           /* a labelled point on a series: three times the line's stroke, so it reads as a thing on a phone, not a kink */
+  --chart-band: rgb(255 255 255 / 0.06);    /* the area between two series (a gap, a cost): a neutral lift, never a hue */
+  --chart-band-hl: rgb(255 255 255 / 0.11); /* that area while highlighted: brighter lift, the fill stays neutral (amber is never a fill) */
+  --chart-bar:    var(--line-strong);  /* a bar at rest: a solid neutral fill that reads as the picture at 40% playback, never a hue */
+  --chart-bar-hl: var(--ink-2);        /* a highlighted bar: clearly lighter than its neighbours (r3 Bayes: ink-3 barely showed); amber goes on its end edge, never the fill */
+  --chart-zero-within: 0.5;           /* a line chart's y axis starts at 0 unless its data, all one sign, keeps more than half its size away from 0: there 0 would press the lines into a flat band */
+  --seq-span-max: 480px;        /* sequence: lifelines never further apart than this; a wider region scales the diagram (bigger text) instead: a two-party ladder with its notes reaches --scale-max on a full row */
+  --seq-step: 16px;             /* sequence: least time between two events on one lifeline at pitch 1; the flexible pitch opens it */
+  --chart-series-1: var(--ink-3);      /* grouped bars, first series: the light one of a wide pair (2.1:1 to the second), still well under --chart-bar-hl so a lit bar stands out */
+  --chart-series-2: var(--ink-4);      /* grouped bars, second series: the dark one, clear of the canvas (1.9:1); no third grey reads as different, so two series at most */
+  --chart-bar-group-h: 28px;           /* a grouped bar's thickness: its value (--text-node, tight leading) fits beside it, and a row of two stays near two plain bars tall */
+  --seq-lost: 0.6;              /* sequence: a lost message (-x) stops this far across, at its cross */
+  --label-gap: 12px;     /* quiet label above a region (file name, "ast") */
+
+  /* ===== type scale ===== */
+  --text-meta:     14px;  /* token types, line numbers, file labels: glanceable, sentence case, never essential */
+  --text-label:    16px;  /* cur/peek, group labels: must be read */
+  --text-code:     19px;  /* ~60 columns in ~760px; ≈7.6px at 40% */
+  --text-node:     22px;  /* tree node labels */
+  --text-body:     22px;  /* callout sentence */
+  --text-token:    26px;  /* token literals: the objects of the lesson */
+  --text-headline: 32px;  /* one line, calm */
+  --text-title:    56px;  /* title card only */
+  --leading-tight: 1.2;
+  --leading-code:  26px;  /* 1.37 at 19px: compact like an editor, still room for the lift band */
+  --leading-prose: 1.4;
+  --weight-regular: 400;
+  --weight-medium:  500;  /* token literals, node labels, labels */
+  --weight-strong:  600;  /* headline, definitions; nothing heavier */
+  --numeric: tabular-nums; /* line numbers, scene numbers, literals align */
+  --tab-size: 4;
+
+  /* ===== space ===== */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px;  --space-8: 64px;
+
+  /* ===== strokes, radii ===== */
+  --stroke-hair: 1px;    /* group brackets */
+  --stroke-edge: 1.5px;  /* tree edges */
+  --stroke-mark: 2px;    /* cur/peek bars, highlighted-line bar: the thickest stroke in the system */
+  --radius-cell:  6px;   /* token cells, nodes */
+  --radius-field: 10px;  /* code field: larger so nested shapes stay concentric */
+  --radius-edge:  6px;   /* corner radius on orthogonal tree connectors */
+  --edge-spread: 16px;   /* sibling edges leave the parent from distinct points, never one converging spike */
+
+  /* Optical glyph centring in cells (applied per glyph by the engine) */
+  --optical-low:  -0.14em; /* , ; . _ sit on the baseline: raise them */
+
+  /* ===== motion (Linear-like: short, ease-out, no bounce) ===== */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);  /* arrivals and state changes: decisive, quiet settle */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);  /* travel between two positions only */
+  --ease-in:     cubic-bezier(0.55, 0, 1, 0.45);  /* exits */
+  --dur-appear:    200ms;  /* show: opacity 0→1, rise 4px */
+  --appear-rise:   4px;
+  --dur-hide:      140ms;  /* hide: faster than appear */
+  --dur-move:      320ms;  /* move/swap: long enough to track */
+  --dur-grow:      280ms;  /* grow: an edge draws in, then its child node appears */
+  --dur-highlight: 160ms;  /* hl/focus: near-instant, never a fade-in show */
+  --dur-recede:    200ms;  /* dim: slightly slower than hl so focus lands first */
+  --dur-scene:     360ms;  /* scene change: crossfade, longer than any in-scene change so it reads as a chapter turn, short enough not to stall narration */
+  --dur-settle:    600ms;  /* set: the new value holds in amber this long, then settles to rest over --dur-highlight: long enough to be seen at 1x, short enough not to compete with the next cue */
+  --dur-show-sequence: 700ms;  /* per-type override (--dur-<verb>-<type>): a sequence message's show is its packet's flight; at --dur-appear it only flashes across */
+  --dur-move-chart:  700ms;  /* a chart point rolling along its series: a flight across a picture, as a sequence message's */
+  --dur-move-custom: 700ms;  /* a custom item travelling its path; --dur-move stays for markers hopping between cells */
+  --stagger:       40ms;   /* siblings revealed together, in reading order */
+  --reveal-along: 0.5;     /* a label riding a drawing (a mark's, a message's) fades in over the second half of the draw: it arrives with its line, never ahead of it */
+  --reveal-end:   0.8;     /* what sits at a drawing's far end (a series name, a lost message's cross) fades in over the last fifth: as the line gets there */
+  --stagger-max:   6;      /* after 6 items the rest share the last delay: total stagger ≤ 240ms */
+  --ease-appear: var(--ease-out); --ease-move: var(--ease-in-out); --ease-grow: var(--ease-out);
+  --ease-highlight: var(--ease-out); --ease-hide: var(--ease-in);
+}
