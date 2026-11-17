@@ -134,4 +134,8 @@ it offline; `LECTERN_LIVE=1 bun test` adds one live run. `docs/test-coverage.md`
 
 ## Status
 
-Early and private. Good enough for real videos; expect the language to change.
+Early. Good enough for real videos; expect the language to change.
+
+## License
+
+MIT. The example code in `examples/part8/src/` is from *Writing An Interpreter In Go* (Thorsten Ball), also MIT.
