@@ -16,19 +16,12 @@ The agent writes a Markdown file like this one.
 [hl md:5] A heading starts a scene. [hl md:6-11] A block is what's on screen: here, a bar chart.
 [hl md:12-16] A paragraph is what the voice says. [hl md:13,15] A word in brackets is where the picture changes.
 
+<!-- After this scene, lectern/compose.sh plays the real video of lectern/water.md inside a screen outline. -->
 ## You get a video
-::: text cmd @top
+::: text cmd
 `lectern build water.md`
 :::
-::: chart water format=%
-Oceans: 96.5
-Ice: 1.7
-Groundwater: 1.7
-Rivers and lakes: 0.01
-:::
-[hl none] Run one command, and you get this.
-
-Almost all of Earth's water [grow water] sits in the oceans. The fresh water we drink from [hl water:4] rivers and lakes is a sliver too thin to see.
+Run one command, and you get this video.
 
 ## What you get
 ::: bullets out
