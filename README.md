@@ -6,9 +6,9 @@ An agent writes a single Markdown file: what to say, what to show, and on which 
 that file into a finished video, with voice, layout, theme, motion, subtitles and encoding. The agent never writes
 rendering code, positions anything or picks a colour, so every token it spends goes into the explanation.
 
-[![Lectern, explained: you write a Markdown file like this one, run one command, and get a narrated video](docs/media/lectern.gif)](docs/media/lectern.mp4)
+[![Lectern, explained: an AI agent writes a Markdown file like this one, and one command turns it into a narrated video](docs/media/lectern.gif)](docs/media/lectern.mp4)
 
-[Watch the 76-second video with sound](docs/media/lectern.mp4). It was made with Lectern, from
+[Watch the 87-second video with sound](docs/media/lectern.mp4). It was made with Lectern, from
 [`examples/lectern.md`](examples/lectern.md).
 
 ## The Markdown file
