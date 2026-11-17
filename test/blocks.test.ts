@@ -123,6 +123,13 @@ test('--no-audio: a silent soundtrack the length of the video, and subtitles fro
   expect(cues.at(-1)!.end).toBeLessThanOrEqual(built.frames.total / 30 + 1e-3);
 });
 
+test('re-encoded at a constant frame rate, as editors and upload transcoders do, the video keeps its length', async () => {
+  // ffmpeg's fps filter guesses the last frame's length from the gap before it; a video ending on a long hold once
+  // gained that whole hold (1.9 s) at the end.
+  const cfr = await sh(['sh', '-c', `ffmpeg -v error -i '${mp4()}' -map 0:v -vf fps=30 -f null - -progress pipe:1 | grep '^frame=' | tail -1`]);
+  expect(Number(cfr.trim().slice('frame='.length))).toBe(built.frames.total);
+}, 60_000);
+
 test('motion is deterministic: a cold build shooting every frame equals the build that skipped unchanged ones', async () => {
   expect(againRun.code).toBe(0);
   expect(await fingerprint(out, again)).toMatch(/^IDENTICAL/);

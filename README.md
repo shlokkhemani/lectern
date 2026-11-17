@@ -10,7 +10,7 @@ rendering code, positions anything or picks a colour, so every token it spends g
 
 https://github.com/user-attachments/assets/4ec85aac-f776-487a-bee6-d3c482b04fe5
 
-[Watch the 89-second video with sound](docs/media/lectern.mp4). It was made with Lectern, from
+[Watch the 85-second video with sound](docs/media/lectern.mp4). It was made with Lectern, from
 [`examples/lectern.md`](examples/lectern.md); the screen that plays `water.md`'s video is placed by
 [`examples/lectern/compose.ts`](examples/lectern/compose.ts).
 

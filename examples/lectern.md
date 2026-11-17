@@ -7,7 +7,7 @@ title: Lectern
 Lectern
 AI agents write Markdown. Lectern makes the video.
 :::
-This is Lectern. It lets AI agents make videos. You ask an agent for a video, the agent writes one Markdown file, and Lectern turns that file into a narrated video.
+This is Lectern. It's a command-line tool that lets AI agents turn Markdown files into videos.
 
 ## The agent writes a Markdown file
 ::: code md src=lectern/water.md:5-16 lang=markdown "water.md"

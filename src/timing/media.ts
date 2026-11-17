@@ -68,8 +68,14 @@ export function segmentMedia(plan: Plan): SegmentMedia {
   const frames: EncodedFrame[] = [];
   let f = 0;
   plan.capture.forEach((c, image) => {
+    // A segment can end a file (the last scene, a --scenes build). Its last two frames sit one frame apart, so a
+    // tool that guesses the final frame's length from the gap before it (ffmpeg's fps filter does) guesses one frame,
+    // not the whole hold.
+    const last = image === plan.capture.length - 1 && c.repeat > 2;
     if (c.repeat > 1) {
-      frames.push({ image, pts: f * tick, seconds: seconds(c.repeat - 1) });
+      const head = last ? c.repeat - 2 : c.repeat - 1;
+      frames.push({ image, pts: f * tick, seconds: seconds(head) });
+      if (last) frames.push({ image, pts: (f + head) * tick, seconds: seconds(1) });
       frames.push({ image, pts: (f + c.repeat - 1) * tick, seconds: seconds(1) });
     } else {
       frames.push({ image, pts: f * tick, seconds: seconds(c.repeat) });

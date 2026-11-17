@@ -1,8 +1,9 @@
 /**
  * Per-scene segment encode (§6, variable frame rate). Each captured image is encoded
  * as one frame whose duration is its hold, and again on the hold's last frame, so repeated frames cost
- * nothing and a seek inside a hold lands on the held image. Timing says where every frame goes
- * (`segmentMedia`); this module hands that to ffmpeg and checks the result.
+ * nothing and a seek inside a hold lands on the held image. A segment ends on two frames one frame apart, so
+ * tools that guess the last frame's length (ffmpeg's fps filter, editors, upload transcoders) do not stretch
+ * the end. Timing says where every frame goes (`segmentMedia`); this module hands that to ffmpeg and checks it.
  *
  * Verified before use (R701): the packets sit exactly at the planned presentation times, and the segment
  * lasts exactly the planned duration.
