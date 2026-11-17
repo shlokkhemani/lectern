@@ -6,10 +6,10 @@ An agent writes a single Markdown file: what to say, what to show, and on which 
 that file into a finished video, with voice, layout, theme, motion, subtitles and encoding. The agent never writes
 rendering code, positions anything or picks a colour, so every token it spends goes into the explanation.
 
-[![A 90-second video about Lectern, made with Lectern: the title card, then the Markdown lines that produced it, lit one by one](docs/media/lectern.gif)](docs/media/lectern.mp4)
+[![Left: a short Markdown file. Right: the video it makes. As the voice reads each line, the chart changes on the bracketed words.](docs/media/lectern.gif)](docs/media/lectern.mp4)
 
-This video about Lectern was made with Lectern, from one Markdown file: [`examples/lectern.md`](examples/lectern.md).
-The clip above is its first 18 seconds; [watch all 90 seconds with sound](docs/media/lectern.mp4).
+Left: a Markdown file. Right: the video it makes. [Watch the 45-second video with sound](docs/media/lectern.mp4). It was
+made with Lectern, from [`examples/lectern.md`](examples/lectern.md).
 
 ## The Markdown file
 
@@ -23,7 +23,7 @@ title: Where Earth's water is
 
 ## Almost all of it is salty
 
-::: chart water "Share of Earth's water, %"
+::: chart water format=%
 Oceans: 96.5
 Ice: 1.7
 Groundwater: 1.7
@@ -54,7 +54,7 @@ From one Markdown file you get:
 
 The contact sheet of the video above, one tile per beat:
 
-<img src="docs/media/lectern-sheet.png" alt="Contact sheet of the Lectern video: title card, the Markdown source, a pipeline graph, an error message, a speed chart, a scene strip, a comparison and the closing line" width="900">
+<img src="docs/media/lectern-sheet.png" alt="Contact sheet of the demo video: each tile pairs a Markdown file with the picture it makes, from a bar chart to code, a family tree and a ball rolling down a hill" width="900">
 
 ## Quick start
 
@@ -116,7 +116,7 @@ lesson.md → parse → timing plan ← voice (TTS, checked by speech-to-text, c
 | `src/audio/` | TTS, transcription check, voice cache, voice-ahead |
 | `src/render/` | Chrome pool, capture, encode, render cache, build lock |
 | `skill/` | what authoring agents read |
-| `examples/` | `water.md` (the 10-second example above), `lectern.md` (the Markdown file behind the video above) |
+| `examples/` | `water.md` (the 10-second example above), `lectern.md` (the demo video) and the four files it shows, in `lectern/` |
 | `docs/` | `spec-v1.md`, `rulings.md` (product decisions), `design-principles.md` |
 | `test/` | end-to-end tests |
 

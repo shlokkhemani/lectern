@@ -4,7 +4,7 @@ title: Where Earth's water is
 
 ## Almost all of it is salty
 
-::: chart water "Share of Earth's water, %"
+::: chart water format=%
 Oceans: 96.5
 Ice: 1.7
 Groundwater: 1.7
