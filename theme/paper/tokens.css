@@ -1,0 +1,94 @@
+/* lectern theme "paper": a desk of paper. Drawn over the dark theme (src/themes.ts), so this file states only what
+   it changes. Cards are the objects, tape holds them, a red pencil marks what is "now", a slate pencil what was.
+   Reference: an explainer built as paper cards placed on a desk (warm grey paper, cream index cards, masking tape,
+   Garamond, slate-blue names and arrows, a red underline for emphasis). */
+
+:root {
+  /* ===== Paper and ink ===== */
+  --desk:        #e6e2da;  /* the desk: warm grey paper (sampled from the reference) */
+  --bg:          var(--desk);
+  --card:        #efecd8;  /* cream index card: headings, numbered points, cells, nodes */
+  --sheet:       #f4f2ee;  /* white sheet: code, charts, lists, tables */
+  --paper-blue:  #b4c6d6;  /* blue paper: bars, a second kind of thing */
+  --paper-blue-2:#8ea6bd;  /* blue paper, lifted: a highlighted bar */
+  --tape:        rgb(196 168 112 / 0.78);  /* masking tape */
+  --pencil:      #5a6b98;  /* slate pencil: arrows, edges, notes, "held" marks, lookahead */
+  --highlighter: rgb(236 205 96 / 0.40);  /* a highlighter stroke: the band behind a highlighted line */
+
+  --surface-1:   var(--sheet);   /* a region (code field): a sheet of paper */
+  --surface-2:   var(--card);    /* cells and nodes at rest: cards */
+  --surface-3:   #f1e3a8;        /* a lifted cell or node: a card gone over with the highlighter */
+  --line:        #cbc5b7;        /* hairlines on paper: rules, group brackets */
+  --line-strong: var(--pencil);  /* tree and graph edges: drawn in pencil */
+  --ink-1: #26261f;  /* printed text */
+  --ink-2: #55544b;  /* secondary */
+  --ink-3: #8b887d;  /* meta: line numbers, captions */
+  --ink-4: #cdc7b9;  /* receded strokes and fills; a boxed run's chip */
+  --lift:  var(--highlighter);
+
+  --accent:   #c2432c;  /* red pencil: the single "now" mark */
+  --peek:     var(--pencil);
+  --ok:       #4f7d56;
+  --error:    #8f2d56;  /* a fail outcome: plum-red, clear of the red pencil by hue */
+  --mark-alt: #2f7d7a;  /* the second referent of a contrast: teal ink */
+  --diff-add-fill: rgb(79 125 86 / 0.12);
+  --diff-del-fill: rgb(143 45 86 / 0.10);
+
+  --syn-keyword: #6a4f8f;  /* plum ink */
+  --syn-literal: #3f6f5a;  /* green-black ink */
+  --syn-punct:   #7a776d;
+
+  --hl-held-bar:  var(--pencil);
+  --hl-held-edge: var(--pencil);
+
+  --chart-bar:      var(--paper-blue);
+  --chart-bar-hl:   var(--paper-blue-2);
+  --chart-band:     rgb(90 107 152 / 0.10);
+  --chart-band-hl:  rgb(90 107 152 / 0.20);
+  --chart-series-1: var(--paper-blue-2);
+  --chart-series-2: var(--paper-blue);
+
+  /* Paper lifts a millimetre off the desk: a contact shadow and a soft fall-off below. */
+  --shadow-card: 0 1px 1px rgb(70 60 40 / 0.16), 0 6px 14px -6px rgb(70 60 40 / 0.30);
+  --shadow-chip: 0 1px 1px rgb(70 60 40 / 0.16), 0 3px 6px -3px rgb(70 60 40 / 0.26);
+  --tape-w: 56px;
+  --tape-h: 18px;
+  --card-pad: 18px;        /* paper around a card's content */
+  --sheet-pad: 24px;
+
+  /* ===== Type: Garamond reads smaller than Geist at equal px, so every size steps up ===== */
+  --font-display: "Cormorant Garamond", "EB Garamond", Georgia, serif;  /* headline, title */
+  --font-sans:    "EB Garamond", Georgia, serif;   /* everything read (the engine's "sans" slot) */
+  --font-mono:    "IBM Plex Mono", Menlo, monospace;  /* a typed sheet */
+  --headline-tracking: 0;
+  --numeric: lining-nums tabular-nums;
+  --text-meta:     16px;
+  --text-label:    18px;
+  --text-node:     24px;
+  --text-body:     25px;
+  --text-token:    28px;
+  --text-headline: 40px;
+  --text-title:    76px;
+  --weight-strong: 600;
+  --measure-max:   480px;   /* ~44 characters of 25px Garamond */
+  --measure-min:   380px;
+
+  /* ===== Form ===== */
+  --tilt-max:  1.6deg;  /* a card's corner lifts at most --tilt-lift: small cards tilt, big sheets stay nearly square */
+  --tilt-lift: 4px;
+  --radius-cell:  1px;  /* paper has square corners */
+  --radius-field: 1px;
+  --cell-gap: 18px;
+
+  /* ===== Motion: cards are placed, and the camera moves along the desk ===== */
+  --dur-appear:  560ms;  /* show: a card unfolds from its top edge onto the desk, turning slightly as it settles */
+  --ease-appear: cubic-bezier(0.3, 0.55, 0.25, 1);  /* even enough that the unfold is seen, not a snap */
+  --appear-rise: 0px;
+  --appear-fold: 0.04;   /* the card's height, as a share of its own, when it starts to unfold */
+  --appear-turn: 2.2deg; /* extra tilt while it is being placed */
+  --dur-hide:    220ms;
+  --stagger:     110ms;  /* cards are placed one at a time */
+  --scene-pan:   1;
+  --dur-scene:   900ms;  /* the camera's move to the next stretch of desk */
+  --ease-in-out: cubic-bezier(0.45, 0.05, 0.3, 1);  /* travel (the camera, a move): a gentler middle than the base theme's */
+}

@@ -5,7 +5,8 @@ This file is for agents changing the engine. Agents *making videos* read `skill/
 ## Binding docs
 - `docs/rulings.md`: the founder's product decisions. A change that contradicts one goes to the founder first.
 - `docs/design-principles.md`: deep modules, and how tests are written (e2e through the CLI only).
-- `theme/README.md`: the theme rules; `theme/v2/tokens.css` holds every number.
+- `theme/README.md`: the themes and their rules; each theme's `tokens.css` holds every number (`theme/v2/` is the
+  default, `dark`; another theme states only what it changes, `src/themes.ts`).
 - `docs/spec-v1.md`: the architecture; code comments cite its § numbers. `docs/motion.md`: why motion is shaped
   as it is.
 
@@ -14,8 +15,8 @@ This file is for agents changing the engine. Agents *making videos* read `skill/
   and nothing else moves: no CSS animation, timers, canvas, wall clock or randomness. Screenshot skipping and the
   render cache both rely on this.
 - **Every clock lives in `src/timing/`.** Blocks draw a state; they never compute time.
-- **Tokens only.** Blocks take every colour, size and duration from the theme. Amber means "now" and is a glyph,
-  bar or line colour, never a fill.
+- **Tokens only.** Blocks take every colour, size and duration from the theme. The accent (`--accent`) means "now"
+  and is a glyph, bar or line colour, never a fill. A theme restyles blocks only in its `blocks.css`, never in a block.
 - **Byte-identical output.** The same script and voice give the same MP4, SRT, HTML and sheets. After touching
   `src/render/`, `src/runtime/` or anything in a cache key, compare builds with `bench/fingerprint.ts`.
 - **Every diagnostic carries a fix** an author can paste literally, and applying it passes `check`.

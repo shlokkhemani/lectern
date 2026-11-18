@@ -38,19 +38,24 @@ export function createPage(ir: Script, stage: HTMLElement): LecternPage & { entr
   const scenes: SceneDom[] = ir.scenes.map(scene => mountScene(ir, scene.index, stage));
   const plans = new Map<number, { plan: ScenePlan; index: SpanIndex; cues: Cue[] }>();
   const sub = h('div', 'x-sub', stage);
+  const pan = tok('--scene-pan') > 0;
   let entries: SceneEntry[] = [];
 
   const ready = (async () => {
-    await Promise.all(['Geist', 'Geist Mono'].flatMap(f => [400, 500, 600].map(w => document.fonts.load(`${w} ${tok("--text-meta")}px "${f}"`))));
+    // Every face the theme declares, before anything is measured (a face loads only once text uses it).
+    await Promise.all([...document.fonts].map(f => f.load()));
     await document.fonts.ready;
+    stage.classList.add('x-measure');
     scenes.forEach((s, k) => {
       s.el.style.display = 'block';
       const { layout, issues } = layoutScene(ir.scenes[k]!, s.blocks, s.el, s.bodyTop);
       s.layout = layout;
       s.issues = issues.map(i => placed(ir.scenes[k]!, i));
       for (const m of s.blocks.values()) m.rt.geometry?.(m.el);
+      if (tok('--tilt-max')) seedTilts(s.blocks);
       s.el.style.display = 'none';
     });
+    stage.classList.remove('x-measure');
     entries = sceneEntries(ir, settler);
   })();
 
@@ -58,12 +63,16 @@ export function createPage(ir: Script, stage: HTMLElement): LecternPage & { entr
   function drawState(k: number, st: SceneState): void {
     sub.textContent = '';
     scenes.forEach((s, j) => { s.el.style.display = j === k || (j === k - 1 && st.scene < 1) ? 'block' : 'none'; });
+    const p = Math.round(st.scene * 10000) / 10000;
     if (k > 0 && st.scene < 1) {
       const prev = scenes[k - 1]!;
       prev.el.style.opacity = '1';
+      if (pan) prev.el.style.translate = `${-p * tok('--stage-w')}px 0`;
       paint(prev, entries[k]!.outgoing!);
     }
-    scenes[k]!.el.style.opacity = String(Math.round(st.scene * 10000) / 10000);
+    // The theme's scene change: a crossfade, or (--scene-pan) the camera moving along one desk to the next scene.
+    if (pan) scenes[k]!.el.style.translate = p < 1 ? `${(1 - p) * tok('--stage-w')}px 0` : '';
+    else scenes[k]!.el.style.opacity = String(p);
     paint(scenes[k]!, st);
   }
 
@@ -93,7 +102,10 @@ export function createPage(ir: Script, stage: HTMLElement): LecternPage & { entr
     settle(k, n) { drawState(k, settler.settle(k, n)); },
     lint(k) {
       const s = scenes[k]!;
-      const all = [...s.issues, ...lintScene({ scene: ir.scenes[k]!, sceneEl: s.el, blocks: s.blocks, draw: n => drawState(k, settler.settle(k, n)) })];
+      stage.classList.add('x-measure');
+      const found = lintScene({ scene: ir.scenes[k]!, sceneEl: s.el, blocks: s.blocks, draw: n => drawState(k, settler.settle(k, n)) });
+      stage.classList.remove('x-measure');
+      const all = [...s.issues, ...found];
       // An overfull scene (L410) reports only its overflow: everything else found in it may be a side effect (a
       // collision, text pushed off the box or squeezed), and the L410 says what to fix.
       return all.some(i => i.code === 'L410') ? all.filter(i => i.code === 'L410') : all;
@@ -101,6 +113,23 @@ export function createPage(ir: Script, stage: HTMLElement): LecternPage & { entr
     entry: k => entries[k]!,
     drawState,
   };
+}
+
+/**
+ * Each block and part gets a tilt seed in [-1, 1] from its block id and its place in the block, and its half
+ * width: a theme with `--tilt-max` turns them into a small rotation (a card lifted at one corner). A block carried
+ * into a later scene keeps its seeds, so it never twitches at a scene change. Hashed, never random.
+ */
+function seedTilts(blocks: Map<Id, Mounted>): void {
+  for (const [id, m] of blocks) {
+    [m.el, ...m.el.querySelectorAll<HTMLElement>('.xp, [data-card]')].forEach((e, i) => {
+      if (!(e instanceof HTMLElement)) return;
+      let x = 2166136261;
+      for (const c of `${id}:${i}`) x = Math.imul(x ^ c.charCodeAt(0), 16777619);
+      e.style.setProperty('--seed', String(Math.round(((x >>> 0) / 2 ** 32 * 2 - 1) * 1000) / 1000));
+      e.style.setProperty('--half-w', `${Math.round(e.offsetWidth / 2)}px`);
+    });
+  }
 }
 
 /** S = 0 state for `render`: the entry base with the scene's own crossfade still to run. */
@@ -196,6 +225,8 @@ html, body { margin: 0; background: var(--bg); }
 .x-sub { position: absolute; left: var(--margin-x); right: var(--margin-x); bottom: calc(var(--margin-y) / 2);
   text-align: center; white-space: pre-line; color: var(--ink-1);
   font: var(--weight-regular) var(--text-body) / var(--leading-tight) var(--font-sans); }
+/* A theme's tilt (rotate) is decoration: layout and lint measure every frame square. */
+.x-measure * { rotate: none !important; }
 /* The runtime places and scales blocks (each region its own scale); block CSS never overrides it. */
 .x-row > .x-blk { position: absolute; transform-origin: 0 0; }
 `;

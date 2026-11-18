@@ -1,11 +1,12 @@
 /**
- * Motion tokens from `theme/v2/tokens.css`: the timing module is their only reader (seam 6).
+ * Motion tokens from the theme's `tokens.css` (over the default theme's): the timing module is their only reader (seam 6).
  */
 import type { Verb } from '../ir.ts';
 import type { Bezier, DurationToken, EaseToken, MotionTokens } from '../verbs.ts';
 import { VERBS } from '../verbs.ts';
 import { BLOCKS } from '../blocks/registry.ts';
 import type { LoadMotion } from './types.ts';
+import { themeDirs, themeFile } from '../themes.ts';
 
 /**
  * Motion tokens plus per-block-type verb durations: `--dur-<verb>-<type>` (e.g. `--dur-show-sequence`)
@@ -20,7 +21,6 @@ export function verbDuration(m: Motion, verb: Verb, type: string | undefined, ph
   return own ?? m.durations[VERBS[verb].phases[phase]!.duration];
 }
 
-const TOKENS = new URL('../../theme/v2/tokens.css', import.meta.url);
 
 const DURATIONS: DurationToken[] = ['--dur-appear', '--dur-hide', '--dur-move', '--dur-grow', '--dur-highlight', '--dur-recede', '--dur-scene', '--dur-settle'];
 const EASES: EaseToken[] = ['--ease-out', '--ease-in-out', '--ease-in', '--ease-appear', '--ease-move', '--ease-grow', '--ease-highlight', '--ease-hide'];
@@ -68,4 +68,6 @@ export function parseMotion(css: string): Motion {
   return { durations, eases, stagger, staggerMax, byType };
 }
 
-export const loadMotion: LoadMotion = async () => parseMotion(await Bun.file(TOKENS).text());
+/** A theme's motion: its tokens over the default theme's, so a later declaration of a token wins. */
+export const loadMotion: LoadMotion = async theme =>
+  parseMotion((await Promise.all(themeDirs(theme).map(d => themeFile(d, 'tokens.css')))).join('\n'));

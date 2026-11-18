@@ -5,7 +5,7 @@ CLI and reads only what an agent or viewer sees. One line per behaviour the old 
 that covers it now, or **dropped:** why.
 
 Files: `diagnostics` = test/diagnostics.test.ts · `part8` = test/part8.test.ts · `blocks` = test/blocks.test.ts ·
-`outputs` = test/outputs.test.ts · `edits` = test/edits.test.ts · `docs` = test/docs.test.ts · `live` = test/live.test.ts
+`outputs` = test/outputs.test.ts · `paper` = test/paper.test.ts · `edits` = test/edits.test.ts · `docs` = test/docs.test.ts · `live` = test/live.test.ts
 (opt-in, network).
 "Internal" means the behaviour has no output an agent or viewer could see apart from the outputs other lines check.
 
@@ -132,8 +132,15 @@ Files: `diagnostics` = test/diagnostics.test.ts · `part8` = test/part8.test.ts 
 - The flexible sentence names the flexible modules → dropped: internal module flag
 - Lint and audio issues print script line, S·B and block; scene-level issue prints S alone → diagnostics lint tests (lint lines), part8 (audio lines); dropped: scene-level A502 needs a failing take
 
+## Themes (new, 2026-11-18)
+- `theme:` picks a theme; an unknown one is E102 with the themes to write → diagnostics (E102 theme).
+- The paper theme lays out and lints every block clean with its cards tilted, taped and padded → paper.
+- A paper frame is the warm desk, never the dark canvas → paper.
+- A paper scene change is the camera sliding along the desk, not a crossfade (fails on a crossfade) → paper.
+- The dark theme's MP4, SRT and sheets are byte-identical to before themes (bench/fingerprint.ts, by hand).
+
 ## Counts
 Behaviours of the old suite: 108 lines. Covered by an e2e test (fully, or the part an agent or viewer can see; the
 line names what is dropped): 67. Dropped outright: 41. Plus one new line (the three-column compare).
-New suite: 355 tests in 7 files (1 opt-in). On an M4 Pro: 75 s idle before test/edits.test.ts was added (it takes
+New suite: 361 tests in 8 files (1 opt-in). On an M4 Pro: 75 s idle before test/edits.test.ts was added (it takes
 13 s alone); 100–110 s for the whole suite under heavy load (load average 80–150).

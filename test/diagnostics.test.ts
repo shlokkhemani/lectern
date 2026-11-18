@@ -42,7 +42,12 @@ const FIXTURES: Record<string, { text: string; expect: string; fixed?: [string, 
   },
   E102: {
     text: '---\ntitle: T\ncolour: red\n---\n##\nHi.',
-    expect: "t.md:3:1: error E102: unknown front matter key \"colour\"\n  fix: use one of: title, series, lang, voice, say",
+    expect: "t.md:3:1: error E102: unknown front matter key \"colour\"\n  fix: use one of: title, series, lang, voice, theme, say",
+  },
+  'E102 theme': {
+    text: '---\ntitle: T\ntheme: sepia\n---\n##\nHi.',
+    expect: "t.md:3:1: error E102: unknown theme \"sepia\"\n  fix: write \"theme: dark\" or \"theme: paper\"",
+    fixed: ['sepia', 'paper'],
   },
   E103: {
     text: '---\nseries: S\n---\n##\nHi.',

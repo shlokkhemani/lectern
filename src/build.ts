@@ -169,7 +169,7 @@ async function estimateRun(opts: Options, sheets: boolean): Promise<Outcome> {
   const custody = Custody.acquire(outDir);
   try {
     const sweep = custody.sweep();
-    const motion = await sw.time('motion', () => loadMotion());
+    const motion = await sw.time('motion', () => loadMotion(ir.meta.theme));
     const plans = estimatePlans(ir, ks, motion, outcome);
     outcome.length = estimatedLength(ir, ks, plans);
     const jobs = opts.jobs ?? (sheets ? undefined : LINT_POOL_SIZE);
@@ -304,7 +304,7 @@ async function runBuild(ir: Script, ks: number[], outDir: string, opts: Options,
   }
 
   async function renderAll(): Promise<void> {
-    const motion = await sw.time('motion', () => loadMotion());
+    const motion = await sw.time('motion', () => loadMotion(ir.meta.theme));
     const stage = await sw.time('stage', () => openStage(ir, { jobs: opts.jobs, workDir }));
     let exported: Exported | undefined;
     try {

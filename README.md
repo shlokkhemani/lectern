@@ -59,6 +59,11 @@ The contact sheet of the video above, one tile per beat:
 
 <img src="docs/media/lectern-sheet.png" alt="Contact sheet of the demo video: the title, a Markdown file, the chart it makes, what you get, who does what, build times, and why it suits AI agents" width="900">
 
+The look is a theme. `theme: paper` in the front matter draws the same file as cards on a desk: cards are placed as
+the narration reaches them, and the camera slides along the desk between scenes.
+
+<img src="docs/media/paper.png" alt="A scene from the demo in the paper theme: two white sheets taped to a warm grey desk, The agent writes and Lectern does" width="720">
+
 ## Quick start
 
 Needs [Bun](https://bun.sh), `ffmpeg` on the PATH, and two API keys in `.env` at the repo root:

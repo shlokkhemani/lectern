@@ -61,7 +61,7 @@ const start = last, startCpu = lastCpu;
 const { ir, errors } = parse(await Bun.file(file).text(), file, p => { try { return require('node:fs').readFileSync(path.resolve(path.dirname(file), p), 'utf8'); } catch { return null; } });
 if (!ir) throw new Error(errors.map(e => `${e.line}:${e.col} ${e.code} ${e.message}`).join('\n'));
 lap('parse');
-const motion = await loadMotion();
+const motion = await loadMotion(ir.meta.theme);
 const voiced = ir.scenes.map(s => estimateVoice(s));
 const plans = ir.scenes.map((s, k) => {
   const p = planScene(ir, k, voiced[k]!, motion);

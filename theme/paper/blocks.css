@@ -1,0 +1,84 @@
+/* lectern theme "paper": block restyles. Every selector starts at #stage so it wins over a block's own rules.
+   Values are tokens (tokens.css). Paper is flat colour under a soft mottle (desk.png) and shadows: a fine grain,
+   tried first, made every frame several times dearer to screenshot and encode, and speed is the product. */
+
+#stage {
+  --mottle: url(desk.png);   /* the desk's soft mottle, drawn once (an SVG noise filter repainted every frame cost 5x per screenshot) */
+}
+/* The desk moves with its scene, so a camera move reads as one continuous desk. */
+#stage .x-scene { background: var(--mottle) 0 0 / 100% 100% no-repeat, var(--desk); }
+
+#stage .x-head { font-family: var(--font-display); font-weight: var(--weight-strong); }
+#stage .x-head-n { font-weight: var(--weight-medium); }
+
+/* ===== Motion: a part is placed. It unfolds from its top edge (a card swinging down onto the desk), turns a
+   little more than its resting tilt while it does, and is opaque early: paper does not fade. SVG parts keep the
+   base theme's rise. ===== */
+#stage .xp:not(svg *) {
+  --tilt: calc(var(--seed, 0) * min(var(--tilt-max), atan2(var(--tilt-lift), var(--half-w, 1000px))));
+  opacity: calc(min(1, var(--vis) * 3) * (1 - var(--recede) * (1 - var(--recede-opacity))));
+  translate: none;
+  scale: 1 calc(var(--appear-fold) + (1 - var(--appear-fold)) * var(--vis));
+  transform-origin: 0 0;   /* the top edge; and the layout scales blocks from their corner */
+}
+#stage .x-blk { --tilt: calc(var(--seed, 0) * min(var(--tilt-max), atan2(var(--tilt-lift), var(--half-w, 1000px)))); }
+
+/* ===== Paper: a sheet (white) or a card (cream) lifted off the desk, held by tape. A sheet blocks the desk's grain
+   with its own. A block drawn as one sheet tilts as a whole; a block of several cards tilts each card. ===== */
+#stage :is(.c-field, .tr-field, .tm-field, .ck-list, .a-table, .mt-math, .o-callout, .m-col) {
+  background: var(--sheet); box-shadow: var(--shadow-card); border-radius: 0;
+}
+#stage :is(.t-text, .i-head, .i-sub, .u-item, .i-chip, .f-frame) { background: var(--card); box-shadow: var(--shadow-card); border-radius: 0; }
+#stage .x-cell { background: color-mix(in srgb, var(--hl-fill-cell) calc(var(--hl) * 100%), var(--surface-2));
+  box-shadow: var(--shadow-chip); border-radius: 0; }
+#stage :is(.x-blk[data-type=code], .x-blk[data-type=chart], .x-blk[data-type=checklist], .x-blk[data-type=table],
+  .x-blk[data-type=math], .x-blk[data-type=callout], .x-blk[data-type=text]),
+#stage :is(.x-blk[data-type=trace], .x-blk[data-type=terminal]),
+#stage :is(.u-item, .m-col, .x-cell, .gr-node, .r-node, .f-frame) {
+  /* at rest its tilt; while being placed, a little more, the way its seed leans */
+  rotate: calc(var(--tilt) + (1 - var(--vis, 1)) * var(--appear-turn) * clamp(-1, var(--seed, 0) * 4, 1)); }
+
+/* Tape: two strips across a sheet's top corners, one across a small card's top middle. */
+#stage :is(.c-field, .tr-field, .tm-field, .ck-list, .a-table, .mt-math, .t-text, .i-head, .u-item, .m-col, .o-callout, .f-frame) { position: relative; }
+#stage :is(.c-field, .ch-chart, .ck-list, .a-table, .mt-math, .i-head, .u-item, .f-frame)::before,
+#stage :is(.c-field, .ch-chart, .ck-list, .a-table, .mt-math, .i-head, .u-item, .f-frame)::after,
+#stage :is(.t-text, .m-col, .o-callout, .i-sub, .tr-field, .tm-field)::before {
+  content: ""; position: absolute; top: calc(var(--tape-h) / -2); width: var(--tape-w); height: var(--tape-h); background: var(--tape);
+  clip-path: polygon(0 8%, 6% 0, 12% 10%, 18% 2%, 82% 0, 88% 9%, 94% 1%, 100% 8%, 100% 92%, 94% 100%, 88% 91%, 82% 99%, 18% 100%, 12% 90%, 6% 98%, 0 92%);
+  z-index: 2; pointer-events: none;
+}
+#stage :is(.c-field, .ch-chart, .ck-list, .a-table, .mt-math, .i-head, .u-item, .f-frame)::before { left: var(--space-5); rotate: -2deg; }
+#stage :is(.c-field, .ch-chart, .ck-list, .a-table, .mt-math, .i-head, .u-item, .f-frame)::after { right: var(--space-5); rotate: 1.5deg; }
+#stage :is(.t-text, .m-col, .o-callout, .i-sub, .tr-field, .tm-field)::before { left: calc(50% - var(--tape-w) / 2); rotate: -1deg; }
+
+/* ===== Per block ===== */
+/* title: the name on a big card, the subtitle on a small one tucked under its corner */
+#stage .i-head { font-family: var(--font-display); padding: var(--space-5) var(--space-8) var(--space-6); }
+#stage .i-sub { position: relative; align-self: flex-end; margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-5)) 0 0;
+  padding: var(--space-3) var(--space-5); color: var(--ink-1); rotate: calc(0.7 * var(--tilt-max)); z-index: 1; }
+#stage .i-chip { border: 0; }
+
+/* text, callout: a card, a quote sheet */
+#stage .t-text { padding: var(--space-6) var(--space-7); }
+#stage .o-callout { padding: var(--space-6) var(--space-7); }
+
+/* bullets: each point its own card */
+#stage .u-bullets { gap: var(--space-5); }
+#stage .u-item { padding: var(--card-pad) var(--space-6); }
+#stage .u-dash { display: none; }
+
+/* checklist, table, math, chart, code: a sheet */
+#stage .ck-list { padding: var(--sheet-pad) var(--space-7) var(--sheet-pad) var(--space-6); }
+#stage .ck-sq { fill: transparent; stroke: var(--ink-2); stroke-width: 1.4; }
+#stage .a-table { padding: var(--sheet-pad) var(--space-6); }
+#stage .mt-math { padding: var(--sheet-pad) var(--space-7); }
+#stage .ch-chart { padding: var(--sheet-pad) var(--space-6); background: var(--sheet); box-shadow: var(--shadow-card); }
+#stage .ch-bar { border-radius: 0; box-shadow: var(--shadow-chip); }
+#stage :is(.c-field, .tr-field, .tm-field) { padding: var(--space-5) 0 var(--space-4); border-radius: 0; }
+
+/* compare: two sheets */
+#stage .m-col { padding: var(--space-6) var(--space-6); border: 0; }
+#stage .m-label { font-family: var(--font-display); font-size: calc(var(--text-body) * 1.3); color: var(--ink-1); font-weight: var(--weight-strong); }
+
+/* tree and graph: nodes are small cards; edges are pencil lines */
+#stage :is(.r-node, .gr-node) { border: 0; }

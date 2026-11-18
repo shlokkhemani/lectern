@@ -1,10 +1,10 @@
 # lectern: language reference
 
-A script starts with front matter between two `---` lines: `title:` (required; it names the output),
-`series:` (a header label), `lang:` (the default for code blocks) and `say:` (see Narration). Then
-`# Chapter` starts a chapter (numbered, shown in the header) and `## Headline` starts a scene (`##` alone has
-no headline). A block is `::: type id args "caption" @region`, then its body, then `:::`. A line `::: id`
-re-places an earlier block in the region it last had (`@region` moves it), with no body and no closing `:::`.
+A script starts with front matter between two `---` lines: `title:` (required; it names the output), `series:` (a
+header label), `lang:` (the default for code blocks), `theme:` (`dark`, the default, or `paper`: cards on a desk) and
+`say:` (see Narration). Then `# Chapter` starts a chapter (numbered, shown in the header) and `## Headline` starts a
+scene (`##` alone has no headline). A block is `::: type id args "caption" @region`, then its body, then `:::`. A line
+`::: id` re-places an earlier block in the region it last had (`@region` moves it), with no body and no closing `:::`.
 Each paragraph of narration is one beat, with `[cues]` inside it. `<!-- comments -->` go anywhere outside bodies.
 
 **Ids and names.** Ids are `[a-z][a-z0-9-]*`. Block and group ids are unique in the file. No id or name may be a

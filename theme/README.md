@@ -1,7 +1,13 @@
 # lectern — theme
 
-Current: `v2/` — direction A, near-black / Geist (tokens.css, fonts.css, sample.html `?f=main|dim|held|bullets`).
-Frames: `v2/sample-a.png`, `v2/sample-a-dim.png`, `v2/sample-a-bullets.png`, `v2/sample-a-held.png`. v1 (top level) is kept for comparison only.
+A script picks its theme with `theme:` in its front matter (`src/themes.ts`):
+- **dark** (default): `v2/` — direction A, near-black / Geist (tokens.css, fonts.css, sample.html `?f=main|dim|held|bullets`).
+  Frames: `v2/sample-a.png`, `v2/sample-a-dim.png`, `v2/sample-a-bullets.png`, `v2/sample-a-held.png`.
+- **paper**: `paper/` — cards on a desk. Its README says where it departs from the rules below.
+
+Every theme is drawn over dark: its `tokens.css` states only what it changes, and an optional `blocks.css` restyles
+blocks (selectors from `#stage`). This file's rules are dark's; the composition rules (1–4) hold for every theme.
+v1 (top level) is kept for comparison only.
 
 ## References and what each gave
 - **Vercel / Geist** — near-black with a precise grey ramp; chrome removed, type and spacing do the grouping.

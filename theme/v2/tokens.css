@@ -172,3 +172,10 @@
   --ease-appear: var(--ease-out); --ease-move: var(--ease-in-out); --ease-grow: var(--ease-out);
   --ease-highlight: var(--ease-out); --ease-hide: var(--ease-in);
 }
+
+:root {
+  /* ===== paper-only motion and form, off in this theme (src/themes.ts: every theme is drawn over this one) ===== */
+  --tilt-max: 0deg;       /* a card's tilt (seeded per part by the page); 0 = square */
+  --tilt-lift: 0px;
+  --scene-pan: 0;         /* 1 = scenes change by the camera moving along the desk, not by a crossfade */
+}

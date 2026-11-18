@@ -1,9 +1,10 @@
 import type { Script } from '../ir.ts';
 import type { Diagnostics } from './diagnostics.ts';
+import { DEFAULT_THEME, THEMES, isTheme } from '../themes.ts';
 
 type Meta = Script['meta'];
 
-const KEYS = ['title', 'series', 'lang', 'voice', 'say'] as const;
+const KEYS = ['title', 'series', 'lang', 'voice', 'theme', 'say'] as const;
 /** Rulings §9: one TTS model, not author-settable. */
 const TTS_MODEL = 'gemini-3.8-flash-tts';
 
@@ -13,7 +14,7 @@ const TTS_MODEL = 'gemini-3.8-flash-tts';
  * (0-based).
  */
 export function readFrontMatter(lines: readonly string[], diags: Diagnostics): { meta: Meta; body: number } {
-  const meta: Meta = { title: '', slug: '', lang: 'text', voice: 'Charon', ttsModel: TTS_MODEL, say: {} };
+  const meta: Meta = { title: '', slug: '', lang: 'text', voice: 'Charon', ttsModel: TTS_MODEL, theme: DEFAULT_THEME, say: {} };
   const noTitle = () =>
     diags.report('E103', { line: 1, col: 1 }, 'the script has no title', 'start the file with front matter: a "---" line, "title: <video title>", and a closing "---"');
 
@@ -54,6 +55,11 @@ export function readFrontMatter(lines: readonly string[], diags: Diagnostics): {
     const value = scalar(rest);
     if (!value) {
       diags.report('E102', loc, `"${key}" has no value`, `write "${key}: <value>"`);
+      continue;
+    }
+    if (key === 'theme') {
+      if (isTheme(value)) meta.theme = value;
+      else diags.report('E102', loc, `unknown theme "${value}"`, `write "theme: ${Object.keys(THEMES).join('" or "theme: ')}"`);
       continue;
     }
     if (key === 'title' || key === 'series' || key === 'lang' || key === 'voice') meta[key] = value;

@@ -36,6 +36,8 @@ export interface Script {
     lang: string;
     voice: string;
     ttsModel: string;
+    /** The look and motion (`src/themes.ts`). */
+    theme: import('./themes.ts').ThemeName;
     /** Pronunciation map, applied by whole-word match to backtick content and prose (§1.5). */
     say: Record<string, string>;
   };

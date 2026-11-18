@@ -91,4 +91,4 @@ export type ToGlobal = (plans: ScenePlan[], k: number, s: number) => number;
 export type Locate = (plans: ScenePlan[], g: number) => { scene: number; t: number };
 
 /** Read the theme's duration and stagger tokens. Fails, naming the token, if any is missing. */
-export type LoadMotion = () => Promise<MotionTokens>;
+export type LoadMotion = (theme: import('../themes.ts').ThemeName) => Promise<MotionTokens>;

@@ -224,7 +224,12 @@ export const chart: BlockModule<ChartBody> = {
     },
     measure(el, width) {
       const d = doms.get(el)!;
-      return d.kind === 'bar' ? measureBars(el, d, width) : measureLines(el, d, width);
+      // A theme may pad the chart (a sheet of paper around it): the plot is sized inside the padding.
+      const cs = getComputedStyle(el), pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      const { natural } = d.kind === 'bar' ? measureBars(el, d, width - pad) : measureLines(el, d, width - pad);
+      if (!pad) return { natural, height: el.offsetHeight };
+      el.style.width = `${natural + pad}px`;
+      return { natural: natural + pad, height: el.offsetHeight };
     },
     lint(el) {
       return [...doms.get(el)!.unset.values()];
